@@ -5,15 +5,12 @@ import './App.css';
 
 function App() {
 	const location = useLocation();
-
 	return (
 		<>
 			<nav className="nav-bar">
 				<Link
 					to="/generate"
-					className={
-						location.pathname === '/generate' ? 'active' : ''
-					}
+					className={location.pathname === '/generate' ? 'active' : ''}
 				>
 					Generate QR
 				</Link>

@@ -2,35 +2,48 @@ import e from "express";
 import jwt from "jsonwebtoken";
 import QRCode from "qrcode";
 import cors from "cors";
+import dotenv from "dotenv";
+import { Server } from "socket.io";
+import { createServer } from "http";
+import { verifyQR, startSession, sendToken } from "./controller.js";
+import cookieParser from "cookie-parser";
+
+dotenv.config();
 
 const app = e();
 app.use(e.json());
 app.use(cors());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
-const secretKey = "your_secret_key";
+const httpServer = createServer(app);
 
-app.get("/generate-qr", (req, res) => {
-	const data = jwt.sign({ userId: 1 }, secretKey, { expiresIn: "1h" });
-	QRCode.toDataURL(data, (err, url) => {
-		if (err) {
-			console.error(err);
-			res.status(500).send("Error generating QR code");
-		} else {
-			res.json({ qrCode: url });
-		}
-	});
+const io = new Server(httpServer, {
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST"],
+	},
 });
 
-app.post("/verify-qr", (req, res) => {
-	const { token } = req.body;
-	try {
-		const decoded = jwt.verify(token, secretKey);
-		res.json({ valid: true, data: decoded });
-	} catch (err) {
-		res.json({ valid: false, error: err.message });
-	}
+io.on("connection", socket => {
+    console.log("Client connected:", socket.id);
+
+	setInterval(() => {
+		socket.emit("ping", { time: new Date() });
+	}, 2000);
+
+    socket.on("join-session", (sessionId) => {
+        socket.join(sessionId);
+        console.log(`Joined ${sessionId}`);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Disconnected");
+    });
 });
 
-app.listen(3000, () => {
+app.post("/register-user", sendToken);
+app.post("/start-session", (req, res) => { req.io = io; }, startSession);
+app.post("/verify-qr", verifyQR);
+httpServer.listen(3000, () => {
 	console.log("Server is running on port 3000");
 });

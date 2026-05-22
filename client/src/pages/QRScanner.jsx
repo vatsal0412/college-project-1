@@ -1,11 +1,10 @@
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useEffect, useState } from 'react';
+import { useToken } from '../hooks/useToken';
 import '../App.css';
 
 function QRScanner() {
-	const [data, setData] = useState(null);
-	const [error, setError] = useState(null);
-
+	const { token } = useToken();
 	useEffect(() => {
 		const scanner = new Html5QrcodeScanner(
 			'reader',
@@ -22,17 +21,17 @@ function QRScanner() {
 		scanner.render(
 			async decodedText => {
 				console.log('QR CODE:', decodedText);
-				setData(decodedText);
 				await scanner.clear();
 				// send token to backend
 				try {
-					const response = await fetch('https://college-project-1-xyx0.onrender.com/verify-qr', {
+					const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/verify-qr`, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
 						},
 						body: JSON.stringify({
-							token: decodedText,
+							userToken: token,
+							sessionToken: decodedText,
 						}),
 					});
 					const result = await response.json();
@@ -41,7 +40,7 @@ function QRScanner() {
 					console.error('Error verifying QR code:', err);
 				}
 			},
-			error => {},
+			() => {},
 		);
 
 		return () => {
@@ -56,12 +55,6 @@ function QRScanner() {
 				<p>Position a QR code in front of your camera to scan it.</p>
 			</div>
 			<div id="reader"></div>
-			{data && (
-				<p>
-					<strong>Scanned Data:</strong> {data}
-				</p>
-			)}
-			{error && <p style={{ color: 'red' }}>{error}</p>}
 		</section>
 	);
 }

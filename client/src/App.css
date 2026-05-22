@@ -208,7 +208,7 @@
 
 		&.active {
 			background: var(--accent);
-			color: var(--accent-bg);
+			color: var(--code-bg);
 			border-color: var(--accent);
 		}
 	}
