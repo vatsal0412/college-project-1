@@ -16,6 +16,7 @@ const startSession = (req, res) => {
 }
 
 const verifyQR = (req, res) => {
+	console.log("Verifying QR code with data:", req.body);
 	const { sessionToken, userToken } = req.body;
 	try {
 		const decodedUser = jwt.verify(userToken, process.env.JWT_TOKEN_SECRET);
