@@ -45,6 +45,11 @@ function QRGenerator() {
 				{
 					method: 'POST',
 					headers: { Authorization: `Bearer ${token}` },
+					body: {
+						qrInterval: 10000,
+						sessionTimeout: 60000,
+						// sessionTimeout: 15000, // for testing
+					}
 				},
 			).then(res => res.json());
 
