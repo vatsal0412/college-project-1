@@ -11,7 +11,7 @@ const secretKey = "your_secret_key";
 
 app.get("/generate-qr", (req, res) => {
 	const data = jwt.sign({ userId: 1 }, secretKey, { expiresIn: "1h" });
-	QRCode.toDataURL("data", (err, url) => {
+	QRCode.toDataURL(data, (err, url) => {
 		if (err) {
 			console.error(err);
 			res.status(500).send("Error generating QR code");
@@ -22,7 +22,6 @@ app.get("/generate-qr", (req, res) => {
 });
 
 app.post("/verify-qr", (req, res) => {
-	console.log("Received token:", req.body.token);
 	const { token } = req.body;
 	try {
 		const decoded = jwt.verify(token, secretKey);

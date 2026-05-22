@@ -26,7 +26,7 @@ function QRScanner() {
 				await scanner.clear();
 				// send token to backend
 				try {
-					await fetch('http://localhost:3000/verify-qr', {
+					await fetch('https://college-project-1-xyx0.onrender.com/verify-qr', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
@@ -39,10 +39,7 @@ function QRScanner() {
 					console.error('Error verifying QR code:', err);
 				}
 			},
-			error => {
-				console.error('QR scan error:', error);
-				setError(`Error scanning QR code: ${error}`);
-			},
+			error => {},
 		);
 
 		return () => {
