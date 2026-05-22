@@ -6,7 +6,7 @@ function QRGenerator() {
 
 	const handleGenerateQR = async () => {
 		try {
-			const response = await fetch('http://localhost:3000/generate-qr');
+			const response = await fetch('https://college-project-1-xyx0.onrender.com/generate-qr');
 			const data = await response.json();
 			setImage(data.qrCode);
 		} catch (error) {
