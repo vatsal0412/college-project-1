@@ -42,7 +42,7 @@ io.on("connection", socket => {
 });
 
 app.post("/register-user", sendToken);
-app.post("/start-session", (req, res) => { req.io = io; }, startSession);
+app.post("/start-session", (req, res, next) => { req.io = io; next(); }, startSession);
 app.post("/verify-qr", verifyQR);
 httpServer.listen(3000, () => {
 	console.log("Server is running on port 3000");

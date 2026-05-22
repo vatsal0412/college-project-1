@@ -40,21 +40,35 @@ function QRGenerator() {
 		const newSocket = io(import.meta.env.VITE_SERVER_URL);
 
 		newSocket.on('connect', async () => {
+			console.log('Connected to server, socket ID:', newSocket.id);
 			const { sessionId } = await fetch(
 				`${import.meta.env.VITE_SERVER_URL}/start-session`,
 				{
 					method: 'POST',
-					headers: { Authorization: `Bearer ${token}` },
-					body: {
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
 						qrInterval: 10000,
 						sessionTimeout: 60000,
-						// sessionTimeout: 15000, // for testing
-					}
+					}),
 				},
-			).then(res => res.json());
-
+			)
+				.then(res => {
+					console.log('Start session response status:', res);
+					return res.json();
+				})
+				.catch(err => {
+					console.error('Error starting session:', err);
+					throw err;
+				});
+			console.log('Started session with ID:', sessionId);
 			newSocket.emit('join-session', sessionId);
-			newSocket.on('qr-update', ({ qrImage }) => setImage(qrImage));
+			newSocket.on('qr-update', ({ qrImage }) => {
+				console.log('Received QR update:', qrImage);
+				setImage(qrImage);
+			});
 
 			timeoutRef.current = setTimeout(() => {
 				console.log('Disconnecting socket...');

@@ -9,7 +9,7 @@ const sendToken = (req, res) => {
 }
 
 const startSession = (req, res) => {
-	const { io, qrInterval = 10000, sessionTimeout = 60000 } = req;
+	const { io, body: { qrInterval = 10000, sessionTimeout = 60000 } } = req;
 	const sessionId = `session-${Date.now()}`;
 	startQRRotation(io, sessionId, qrInterval, sessionTimeout);
 	res.json({ sessionId });
